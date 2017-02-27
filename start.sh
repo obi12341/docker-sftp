@@ -34,6 +34,7 @@ else
     chown ${USER_ID}:${GROUP_ID} /data/incoming
     mkdir /data/.ssh
     cd /data/.ssh
+    touch authorized_keys
 fi
 
 exec /usr/sbin/sshd -D -e
