@@ -33,7 +33,7 @@ else
 
     chown ${USER_ID}:${GROUP_ID} /data/incoming
     
-    if (  ! -e /data/.ssh/authorized_keys ); then
+    if (  ! -e /data/.ssh/authorized_keys && ! -z "$PUBKEY" ); then
         mkdir /data/.ssh
         touch /data/.ssh/authorized_keys
         echo ${PUBKEY} >> /data/.ssh/authorized_keys
