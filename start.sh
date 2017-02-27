@@ -3,6 +3,7 @@ USER=${USER:-sftp}
 USER_ID=${USER_ID:-1000}
 GROUP_ID=${GROUP_ID:-1000}
 PASS=${PASS:-c83eDteUDT}
+PUBKEY=${PUBKEY:-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZsVC5PP1RCP6iX2yW/zIKWk+eJzUjHvX9XmeE8FbQG/FqQVyGmo8PC/CqscQtJIfHHTVKXl2bZ9UBhqDkK2fia8GcN35/ypxw98/GGZERMUoxRW+ia4lGYQwM+9YToiadYgJVKs51K8J8tTz0GYSmbhvN3KLrLIN4TS8FXj0Z0tcDtIbvegkBk6iXlPiEKf6rrYpqEibCZ+j0ykt9nxGGPYIh9Ujg8I1wPNF/Ov4CzzfVoNrKCWzn0v6ovcC8Ao0MijaNq7cXZ0STW7OC3gO9/jYN8hcTfk55XNZUyljnvsLT9E5are6f60bRjKsu3ENaZVvEQ9e9JTQ4iIoFoCU1
 
 for type in rsa dsa ecdsa ed25519; do
   if ! [ -e "/ssh/ssh_host_${type}_key" ]; then
@@ -35,6 +36,7 @@ else
     mkdir /data/.ssh
     cd /data/.ssh
     touch authorized_keys
+    echo ${PUBKEY} >> authorized_keys
 fi
 
 exec /usr/sbin/sshd -D -e
