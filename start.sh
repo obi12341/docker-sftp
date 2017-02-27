@@ -32,6 +32,8 @@ else
     usermod -aG sftp-only ${USER}
 
     chown ${USER_ID}:${GROUP_ID} /data/incoming
+    mkdir /data/.ssh
+    cd /data/.ssh
 fi
 
 exec /usr/sbin/sshd -D -e
