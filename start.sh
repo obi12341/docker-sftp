@@ -34,9 +34,8 @@ else
 
     chown ${USER_ID}:${GROUP_ID} /data/incoming
     mkdir /data/.ssh
-    cd /data/.ssh
-    touch authorized_keys
-    echo ${PUBKEY} >> authorized_keys
+    touch /data/.ssh/authorized_keys
+    echo ${PUBKEY} >> /data/.ssh/authorized_keys
 fi
 
 exec /usr/sbin/sshd -D -e
