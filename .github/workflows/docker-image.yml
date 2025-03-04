@@ -19,7 +19,9 @@ jobs:
         images: ghcr.io/${{ github.repository }}
         tags: |
           type=ref,event=branch,enable=true,prefix=
-          type=ref,event=tag,enable=true,prefix=
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
     
     - name: Login to GitHub Container Registry
       if: github.event_name != 'pull_request'
