@@ -1,19 +1,28 @@
 FROM ubuntu:24.04
 
-RUN apt-get update && apt-get install -y \
+LABEL maintainer="Patrick Oberdorf <patrick@oberdorf.net>"
+LABEL description="Secure SFTP server with customizable user"
+LABEL version="1.0"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
   openssh-server \
-  mcrypt \
+  whois \
   && mkdir /var/run/sshd \
   && chmod 0755 /var/run/sshd \
   && mkdir -p /data/incoming \
+  && mkdir /ssh/ \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-  && mkdir /ssh/
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ADD start.sh /usr/local/bin/start.sh
-ADD sshd_config /etc/ssh/sshd_config
+COPY sshd_config /etc/ssh/sshd_config
+COPY start.sh /usr/local/bin/
+RUN chmod 755 /usr/local/bin/start.sh
 
-VOLUME ["/data/incoming"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD pgrep sshd >/dev/null || exit 1
+
+VOLUME ["/data/incoming", "/ssh"]
+
 EXPOSE 22
 
 CMD ["/bin/bash", "/usr/local/bin/start.sh"]
