@@ -1,48 +1,28 @@
-# What ports, IPs and protocols we listen for
 Port 22
-# Use these options to restrict which interfaces/protocols sshd will bind to
-#ListenAddress ::
-#ListenAddress 0.0.0.0
 Protocol 2
 
 
-# Logging
 SyslogFacility AUTH
 LogLevel INFO
 
-# Authentication:
 LoginGraceTime 120
 PermitRootLogin no
 StrictModes yes
 PubkeyAuthentication yes
-#AuthorizedKeysFile	%h/.ssh/authorized_keys
-
-# Don't read the user's ~/.rhosts and ~/.shosts files
 IgnoreRhosts yes
 
-# For this to work you will also need host keys in /etc/ssh_known_hosts
 HostbasedAuthentication no
 
-# To enable empty passwords, change to yes (NOT RECOMMENDED)
 PermitEmptyPasswords no
 
-# Change to yes to enable challenge-response passwords (beware issues with
-# some PAM modules and threads)
 ChallengeResponseAuthentication no
 
-# Change to no to disable tunnelled clear text passwords
 PasswordAuthentication yes
 
-########## Cryptography ##########
-
-# explicitly define cryptography algorithms to avoid the use of weak algorithms
-# AES-CTR and Chacha20-Poly1305 modes have been removed to mitigate the Terrapin attack
-#   https://terrapin-attack.com/
 Ciphers aes256-gcm@openssh.com,aes128-gcm@openssh.com
 HostKeyAlgorithms rsa-sha2-512,rsa-sha2-256,ssh-ed25519
 MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com
 
-# HostKeys for protocol version 2
 HostKey /etc/ssh/ssh_host_rsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
 
@@ -51,26 +31,12 @@ KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sh
 X11Forwarding no
 X11DisplayOffset 10
 PrintMotd no
-PrintLastLog no
 TCPKeepAlive yes
 
-# Allow client to pass locale environment variables
 AcceptEnv LANG LC_*
 
 Subsystem sftp internal-sftp
 
-# Set this to 'yes' to enable PAM authentication, account processing,
-# and session processing. If this is enabled, PAM authentication will
-# be allowed through the ChallengeResponseAuthentication and
-# PasswordAuthentication.  Depending on your PAM configuration,
-# PAM authentication via ChallengeResponseAuthentication may bypass
-# the setting of "PermitRootLogin without-password".
-# If you just want the PAM account and session checks to run without
-# PAM authentication, then enable this but set PasswordAuthentication
-# and ChallengeResponseAuthentication to 'no'.
-UsePAM yes
-
-# SSH Chroot
 Match Group sftp-only
   ChrootDirectory %h
   ForceCommand internal-sftp

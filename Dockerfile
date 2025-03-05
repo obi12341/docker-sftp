@@ -1,28 +1,30 @@
-FROM ubuntu:24.04
+FROM alpine:latest
 
 LABEL maintainer="Patrick Oberdorf <patrick@oberdorf.net>"
-LABEL description="Secure SFTP server with customizable user"
-LABEL version="1.0"
+LABEL description="Secure SFTP server with customizable user based on Alpine Linux"
+LABEL version="2.0"
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
   openssh-server \
-  whois \
-  && mkdir /var/run/sshd \
+  openssh-server-pam \
+  openssh-sftp-server \
+  shadow \
+  perl \
+  && mkdir -p /var/run/sshd \
   && chmod 0755 /var/run/sshd \
   && mkdir -p /data/incoming \
-  && mkdir /ssh/ \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  && mkdir -p /ssh/ \
+  && rm -rf /tmp/* /var/cache/apk/*
 
 COPY sshd_config /etc/ssh/sshd_config
 COPY start.sh /usr/local/bin/
 RUN chmod 755 /usr/local/bin/start.sh
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD pgrep sshd >/dev/null || exit 1
+  CMD ps | grep sshd | grep -v grep > /dev/null || exit 1
 
 VOLUME ["/data/incoming", "/ssh"]
 
 EXPOSE 22
 
-CMD ["/bin/bash", "/usr/local/bin/start.sh"]
+CMD ["/bin/sh", "/usr/local/bin/start.sh"]
