@@ -1,7 +1,6 @@
 #!/bin/sh
 set -e
 
-# === Configuration ===
 USER=${USER:-sftp}
 USER_ID=${USER_ID:-1000}
 GROUP_ID=${GROUP_ID:-1000}
@@ -9,7 +8,6 @@ PASS=${PASS:-}
 DATA_DIR="/data"
 INCOMING_DIR="${DATA_DIR}/incoming"
 
-# === Helper Functions ===
 log() {
   echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
@@ -19,7 +17,6 @@ error() {
   exit 1
 }
 
-# Validate inputs
 [ -z "$PASS" ] && [ -z "$PUBKEY" ] && error "Either PASS or PUBKEY must be provided"
 case "$USER_ID" in
 '' | *[!0-9]*) error "USER_ID must be a number" ;;
@@ -28,7 +25,6 @@ case "$GROUP_ID" in
 '' | *[!0-9]*) error "GROUP_ID must be a number" ;;
 esac
 
-# === SSH Host Keys ===
 log "Checking SSH host keys..."
 for type in rsa ecdsa ed25519; do
   if ! [ -e "/ssh/ssh_host_${type}_key" ]; then
@@ -40,13 +36,11 @@ for type in rsa ecdsa ed25519; do
   ln -sf "/ssh/ssh_host_${type}_key.pub" "/etc/ssh/ssh_host_${type}_key.pub"
 done
 
-# === User Management ===
 if id "${USER}" >/dev/null 2>&1; then
   log "User ${USER} already exists"
 else
   log "Creating user ${USER}"
 
-  # Remove any existing user/group with the same ID to avoid conflicts
   existing_user=$(grep ":${USER_ID}:" /etc/passwd | cut -d: -f1 || true)
   if [ -n "$existing_user" ]; then
     log "Removing existing user with ID ${USER_ID}: $existing_user"
@@ -59,7 +53,6 @@ else
     groupdel "$existing_group" 2>/dev/null || true
   fi
 
-  # Create group and user
   addgroup -g ${GROUP_ID} sftp-only
 
   if [ -n "$PASS" ]; then
@@ -74,20 +67,15 @@ else
   fi
 fi
 
-# === Directory Setup ===
-# IMPORTANT: For chroot to work, the chroot directory (/data) must be owned by root
-# and not writable by anyone else
 log "Setting up directory permissions for chroot"
 mkdir -p "$DATA_DIR"
 chown root:root "$DATA_DIR"
 chmod 755 "$DATA_DIR"
 
-# User only needs write access to the incoming directory
 mkdir -p "$INCOMING_DIR"
 chown ${USER}:sftp-only "$INCOMING_DIR"
 chmod 755 "$INCOMING_DIR"
 
-# === SSH Keys Setup ===
 if [ -n "$PUBKEY" ]; then
   SSH_DIR="${DATA_DIR}/.ssh"
   AUTH_KEYS="${SSH_DIR}/authorized_keys"
@@ -105,6 +93,5 @@ if [ -n "$PUBKEY" ]; then
   chmod 600 "$AUTH_KEYS"
 fi
 
-# === Start SSHD ===
 log "Starting SSHD..."
 exec /usr/sbin/sshd -D -e
