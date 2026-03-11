@@ -12,6 +12,7 @@ RUN apk add --no-cache \
   perl \
   && mkdir -p /var/run/sshd \
   && chmod 0755 /var/run/sshd \
+  && apk del openssh-server \
   && mkdir -p /data/incoming \
   && mkdir -p /ssh/ \
   && rm -rf /tmp/* /var/cache/apk/*
