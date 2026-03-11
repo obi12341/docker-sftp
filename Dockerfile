@@ -25,6 +25,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 
 VOLUME ["/data/incoming", "/ssh"]
 
-EXPOSE 22
+EXPOSE 22 
+EXPOSE 8080
 
 CMD ["/bin/sh", "/usr/local/bin/start.sh"]
