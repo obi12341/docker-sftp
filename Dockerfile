@@ -2,7 +2,7 @@ FROM alpine:latest
 
 LABEL maintainer="Patrick Oberdorf <patrick@oberdorf.net>"
 LABEL description="Secure SFTP server with customizable user based on Alpine Linux"
-LABEL version="2.0"
+LABEL version="3.0"
 
 RUN apk add --no-cache \
   openssh-server \
